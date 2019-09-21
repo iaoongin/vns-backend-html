@@ -2,16 +2,14 @@
   <el-row class="tac">
     <el-col :span="10" class="dash">
       <h5>VNS</h5>
-      <el-menu router class="el-menu-vertical-demo" default-active="personalInfo">
+      <el-menu router class="el-menu-vertical-demo" :default-active="active">
         <el-submenu index="1">
           <template slot="title">
             <i class="el-icon-setting"></i>
             <span>业务</span>
           </template>
           <el-menu-item-group>
-            <el-menu-item index="personalInfo">
-              用户管理
-            </el-menu-item>
+            <el-menu-item index="personalInfo">用户管理</el-menu-item>
             <el-menu-item index="architectureInfo">建筑信息</el-menu-item>
             <el-menu-item index="commentInfo">评论</el-menu-item>
           </el-menu-item-group>
@@ -28,25 +26,31 @@
       </el-menu>
     </el-col>
   </el-row>
-
-
 </template>
 
 <script>
-  export default {
-    name: "dash-asider"
+export default {
+  name: "dash-asider",
+  data() {
+    return {
+      active: "personalInfo"
+    };
+  },
+  created() {
+    this.active = this.$route.name;
   }
+};
 </script>
 
 <style scoped>
-  h5{
-    text-align: center;
-  }
-  .dash {
-    width: 13rem;
-  }
+h5 {
+  text-align: center;
+}
+.dash {
+  width: 13rem;
+}
 
-  .dash ul {
-    height: 35rem;
-  }
+.dash ul {
+  height: 35rem;
+}
 </style>

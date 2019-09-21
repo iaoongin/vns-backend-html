@@ -134,6 +134,7 @@
           userNickname: '123',
           userStatus: 'asd',
         },
+        searchForm: {},
         tableData: [],
         loading: true,
         total: 10,
@@ -141,7 +142,7 @@
       }
     },
     created: function () {
-      this.pagination();
+      // this.pagination();
     },
     methods: {
       pagination(page) {

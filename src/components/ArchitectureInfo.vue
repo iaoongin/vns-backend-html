@@ -23,6 +23,9 @@
 
         <!--操作 start-->
         <el-row title="操作" name="2" class="operate">
+          <el-button @click="refresh()">
+            <i class="el-icon-refresh-right" />刷新
+          </el-button>
           <el-button type="success" @click="dialogAddVisible = true">
             <i class="el-icon-plus" />添加
           </el-button>
@@ -37,24 +40,45 @@
             class="pagination"
             background
             layout="prev, pager, next"
-            :page-count="total"
-            :current-page="page"
+            :page-count="pages"
+            :current-page="current"
             @current-change="handleCurrentChange"
           ></el-pagination>
           <!--分页 end-->
         </el-row>
         <!--添加dialog start-->
 
-        <el-dialog title="添加用户" :visible.sync="dialogAddVisible">
-          <el-form :model="form" :inline="true" :close-on-click-modal="false">
-            <el-form-item label="昵称" :xs="6">
-              <el-input v-model="form.userNickname" auto-complete="off"></el-input>
+        <el-dialog title="添加建筑" :visible.sync="dialogAddVisible">
+          <el-form :model="form" inline="true" label-position="right" label-width="80px" :close-on-click-modal="false">
+            <el-form-item label="建筑名" :xs="6">
+              <el-input v-model="form.name" auto-complete="off"></el-input>
             </el-form-item>
-            <el-form-item label="状态" :xs="6">
-              <el-input v-model="form.userStatus" auto-complete="off"></el-input>
+            <el-form-item label="经度" :xs="6">
+              <el-input v-model="form.longitude" auto-complete="off"></el-input>
             </el-form-item>
-            <el-form-item label="角色" :xs="6">
-              <el-input v-model="form.userRole" auto-complete="off"></el-input>
+            <el-form-item label="纬度" :xs="6">
+              <el-input v-model="form.latitude" auto-complete="off"></el-input>
+            </el-form-item>
+            <el-form-item label="标记路径" :xs="6">
+              <el-input v-model="form.markIconPath" auto-complete="off"></el-input>
+            </el-form-item>
+            <el-form-item label="标记内容" :xs="6">
+              <el-input v-model="form.markLabelContent" auto-complete="off"></el-input>
+            </el-form-item>
+            <el-form-item label="标记点击内容" :xs="6">
+              <el-input v-model="form.markCalloutContent" auto-complete="off"></el-input>
+            </el-form-item>
+            <el-form-item label="标记宽度" :xs="6">
+              <el-input v-model="form.markWidth" auto-complete="off"></el-input>
+            </el-form-item>
+            <el-form-item label="标记高度" :xs="6">
+              <el-input v-model="form.markHeight" auto-complete="off"></el-input>
+            </el-form-item>
+            <el-form-item label="标记信息内容" :xs="6">
+              <el-input v-model="form.markInfoContent" auto-complete="off"></el-input>
+            </el-form-item>
+            <el-form-item label="详情" :xs="6">
+              <el-input v-model="form.desc" auto-complete="off"></el-input>
             </el-form-item>
           </el-form>
           <div slot="footer" class="dialog-footer">
@@ -120,11 +144,16 @@
           v-loading="loading"
           size="mini"
         >
-          <el-table-column prop="userNickname" label="昵称" width="180"></el-table-column>
-          <el-table-column prop="userWxid" label="微信id" width="180"></el-table-column>
-          <el-table-column prop="userDate" label="注册时间" width="180" sortable></el-table-column>
-          <el-table-column prop="userStatus" label="用户状态" sortable></el-table-column>
-          <el-table-column prop="userRole" label="用户角色"></el-table-column>
+          <el-table-column prop="name" label="建筑名" width="180"></el-table-column>
+          <el-table-column prop="longitude" label="经度" width="180"></el-table-column>
+          <el-table-column prop="latitude" label="纬度" width="180" sortable></el-table-column>
+          <el-table-column prop="markIconPath" label="标记路径" sortable></el-table-column>
+          <el-table-column prop="markLabelContent" label="标记内容"></el-table-column>
+          <el-table-column prop="markCalloutContent" label="标记点击内容"></el-table-column>
+          <el-table-column prop="markWidth" label="标记宽度"></el-table-column>
+          <el-table-column prop="markHeight" label="标记高度"></el-table-column>
+          <el-table-column prop="markInfoContent" label="标记信息内容"></el-table-column>
+          <el-table-column prop="desc" label="详情"></el-table-column>
         </el-table>
 
         <!--表格 end-->
@@ -134,38 +163,64 @@
 </template>
 
 <script>
+import { fetchList } from "@/api/architecture";
 export default {
   name: "ArchitectureInfo",
   data() {
-      return {
-        dialogAddVisible: false,
-        dialogDeleteVisible: false,
-        dialogModifyVisible: false,
-        form: {
-          userNickname: '123',
-          userStatus: 'asd',
-        },
-        tableData: [],
-        loading: true,
-        total: 10,
-        page: 1
-      }
+    return {
+      dialogAddVisible: false,
+      dialogDeleteVisible: false,
+      dialogModifyVisible: false,
+      form: {
+        userNickname: "123",
+        userStatus: "asd"
+      },
+      searchForm: {},
+      tableData: [],
+      loading: false,
+      current: 1,
+      pages: 1,
+      size: 10
+    };
+  },
+  created: function() {
+    this.refresh();
+  },
+  methods: {
+    pagination(current) {
+      this.loading = true;
+      fetchList({
+        current: current,
+        size: this.size
+      }).then(res => {
+        this.loading = false;
+        var dt = res.data;
+        this.tableData = dt.records;
+        this.current = parseInt(dt.current);
+        this.pages = parseInt(dt.pages);
+      });
+    },
+    refresh() {
+      this.pagination(this.current);
+    },
+    handleCurrentChange(val) {
+      this.pagination(val);
     }
+  }
 };
 </script>
 
 <style scoped>
-  .operate {
-    margin-top: 1rem;
-    margin-bottom: 1rem;
-  }
+.operate {
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+}
 
-  .operate .el-button {
-    padding: 7px 7px;
-  }
+.operate .el-button {
+  padding: 7px 7px;
+}
 
-  .pagination {
-    float: right;
-  }
-
+.pagination {
+  float: right;
+}
 </style>
